@@ -3,12 +3,19 @@ import socket
 import json
 from threading import Thread
 
+
+
+
 # ---ПУГАМЕ НАЛАШТУВАННЯ ---
 WIDTH, HEIGHT = 800, 600
 init()
 screen = display.set_mode((WIDTH, HEIGHT))
 clock = time.Clock()
 display.set_caption("Пінг-Понг")
+background = image.load("background.jpeg")
+background = transform.scale(background, (WIDTH, HEIGHT))
+paddle_img = image.load("paddle.png")
+paddle_img = transform.scale(paddle_img, (20, 100))  # розмір як у ракетки
 # ---СЕРВЕР ---
 def connect_to_server():
     while True:
@@ -56,14 +63,14 @@ while True:
             exit()
 
     if "countdown" in game_state and game_state["countdown"] > 0:
-        screen.fill((0, 0, 0))
+        screen.blit(background, (0, 0))
         countdown_text = font.Font(None, 72).render(str(game_state["countdown"]), True, (255, 255, 255))
         screen.blit(countdown_text, (WIDTH // 2 - 20, HEIGHT // 2 - 30))
         display.update()
         continue  # Не малюємо гру до завершення відліку
 
     if "winner" in game_state and game_state["winner"] is not None:
-        screen.fill((20, 20, 20))
+        screen.blit(background, (0, 0))
 
         if you_winner is None:  # Встановлюємо тільки один раз
             if game_state["winner"] == my_id:
@@ -88,9 +95,9 @@ while True:
         continue  # Блокує гру після перемоги
 
     if game_state:
-        screen.fill((30, 30, 30))
-        draw.rect(screen, (0, 255, 0), (20, game_state['paddles']['0'], 20, 100))
-        draw.rect(screen, (255, 0, 255), (WIDTH - 40, game_state['paddles']['1'], 20, 100))
+        screen.blit(background, (0, 0))
+        screen.blit(paddle_img, (20, game_state['paddles']['0']))
+        screen.blit(paddle_img, (WIDTH - 40, game_state['paddles']['1'])))
         draw.circle(screen, (255, 255, 255), (game_state['ball']['x'], game_state['ball']['y']), 10)
         score_text = font_main.render(f"{game_state['scores'][0]} : {game_state['scores'][1]}", True, (255, 255, 255))
         screen.blit(score_text, (WIDTH // 2 -25, 20))
